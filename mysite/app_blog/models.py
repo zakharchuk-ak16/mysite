@@ -6,15 +6,25 @@ from django.urls import reverse
 # mysite /urls.py
 class Category(models.Model):
     category = models.CharField(u'Категорія',
-max_length=250, help_text=u'Максимум 250 символів')
-    slug = models.SlugField(u'Слаг', blank=True)
-
+                                max_length=250, help_text=u'Максимум 250 символів')
+    slug = models.SlugField(u'Слаг')
+    objects = models.Manager()
     class Meta:
         verbose_name = u'Категорія для публікації'
         verbose_name_plural = u'Категорії для публікації'
 
     def __str__(self):
         return self.category
+
+    def get_absolute_url(self):
+        try:
+            url = reverse('articles-category-list',
+                          kwargs={'slug': self.slug})
+        except:
+            url = "/"
+        return url
+
+
 class Article(models.Model):
     title = models.CharField(u'Заголовок', max_length=250,
                             help_text=u'Максимум 250символів')
@@ -65,8 +75,11 @@ class ArticleImage(models.Model):
     class Meta:
         verbose_name = u'Фото для статті'
         verbose_name_plural = u'Фото для статті'
+
     def __str__(self):
-        return self.title\
+            return self.title
+
     @property
+
     def filename(self):
         return self.image.name.rsplit('/', 1)[-1]
